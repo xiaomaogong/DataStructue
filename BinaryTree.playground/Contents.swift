@@ -17,6 +17,26 @@ class Node {
     }
 }
 
+struct Queue<T> {
+    private var elements = [T]()
+    
+    mutating func enqueue(_ item: T) {
+        elements.append(item)
+    }
+    
+    mutating func dequeue() -> T? {
+        guard !elements.isEmpty else {
+            return nil
+        }
+        
+        return elements.removeFirst()
+    }
+    
+    func front() -> T? {
+        return elements.first
+    }
+}
+
 struct BinaryTree {
     let rootNode: Node
     
@@ -59,6 +79,23 @@ struct BinaryTree {
         print(node.val)
     }
     
+    //Layer
+    func printLayerNodes(node: Node) {
+        var allNodes = Queue<Node>()
+        
+        allNodes.enqueue(node)
+        
+        while let item = allNodes.dequeue() {
+            print(item.val)
+            if let left = item.leftNode {
+                allNodes.enqueue(left)
+            }
+            if let right = item.rightNode {
+                allNodes.enqueue(right)
+            }
+        }
+    }
+    
     init?(valueArr: [String]) {
         if let fistVal = valueArr.first {
             self.rootNode = Node(val: fistVal, leftNode: nil, rightNode: nil)
@@ -70,12 +107,18 @@ struct BinaryTree {
         }
     }
     
-    func insertNodeForVal(node: Node, val: String) {
+    
+    //Search node
+    func findNodeWithVal(val :String) -> Node? {
+        return self.findNode(fromNode: self.rootNode, val: val)
+    }
+    
+    private func insertNodeForVal(node: Node, val: String) {
         if val <= node.val {
             if let left = node.leftNode {
-               self.insertNodeForVal(node: left, val: val)
+                self.insertNodeForVal(node: left, val: val)
             }else {
-               node.leftNode = Node(val: val, leftNode: nil, rightNode: nil)
+                node.leftNode = Node(val: val, leftNode: nil, rightNode: nil)
             }
         }else {
             if let right = node.rightNode {
@@ -84,11 +127,6 @@ struct BinaryTree {
                 node.rightNode = Node(val: val, leftNode: nil, rightNode: nil)
             }
         }
-    }
-    
-    //Search node
-    func findNodeWithVal(val :String) -> Node? {
-        return self.findNode(fromNode: self.rootNode, val: val)
     }
     
     private func findNode(fromNode node: Node, val: String) -> Node? {
@@ -110,8 +148,9 @@ struct BinaryTree {
 let tree = BinaryTree(valueArr: ["G","D","A","F","E","M","H","Z"])
 if let realTree = tree {
 //    realTree.printPreOrderNodes(node: realTree.rootNode)
-    realTree.printMiddleOrderNodes(node: realTree.rootNode)
+//    realTree.printMiddleOrderNodes(node: realTree.rootNode)
 //    realTree.printLastOrderNodes(node: realTree.rootNode)
+realTree.printLayerNodes(node: realTree.rootNode)
 }
 //如果是平衡的二叉树时间复杂度是O(log2n)如1024个数总共只需要10次，而线型查找需要1024次
 let foundNode = tree?.findNodeWithVal(val: "E")
